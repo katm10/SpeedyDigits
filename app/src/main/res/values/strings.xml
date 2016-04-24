@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Speedy Digits</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="interstitial_ad_sample">Interstitial Ad Sample</string>
+    <string name="start_level">Level 1</string>
+    <string name="next_level">Next Level</string>
+    <!-- -
+        This is an ad unit ID for an interstitial test ad. Replace with your own interstitial ad unit id.
+        For more information, see https://support.google.com/admob/answer/3052638
+    <!- -->
+    <string name="interstitial_ad_unit_id">ca-app-pub-5211211279714621/4858904590</string>
+<string name="banner">ca-app-pub-5211211279714621/5000224997</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="start">Start!</string>
+    <string name="over">Game Over! Your score is</string>
+    <string name="title_activity_start_page">Speedy Digits</string>
+    <string name="congratulations">Congratulations! You\'ve beat the game!</string>
+    <string name="info">Numbers will be displayed on the screen, and the object of the game is to press them in order. However, as soon as you press the first number, all of the values will disappear. If you click the wrong button, the game will end. Point totals are based on speed and accuracy.
+</string>
+    <string name="signed_in_fmt">sign in complete</string>
+    <string name="loading">loading</string>
+    <string name="home">Return to Home</string>
+    <string name="signed_out">signed out</string>
+    <string name="server_client_id">239251816565-s32p5igp2e5mvra25dbpv6i7na1319i5.apps.googleusercontent.com</string>
+    <string name="google_app_id">239251816565</string>
+    <string name="leadunavail">The leaderboard is currently unavailable. Please sign in to access the leaderboard. </string>
+    <string name="unavail">The achievements are currently unavailable. Please sign in to access achievements. </string>
+
+    <string name="title_activity_game">GameActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="logo_descript">This is a logo that says Speedy Digits.</string>
+    <string name="point_begin">Points:0</string>
+</resources>

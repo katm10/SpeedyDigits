@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_id": "speedy-digits-49465663",
+    "project_number": "239251816565",
+    "name": "Speedy Digits"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:239251816565:android:ac31010ae1f44582",
+        "client_id": "android:com.mohrapps.speedydigits",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.mohrapps.speedydigits",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "239251816565-eoa0rtkn715gumv0vc0o92a6kb7vukbp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mohrapps.speedydigits",
+            "certificate_hash": "BDFD5E4C66F9EE6E57A2543C72E1BC21E93646FC"
+          }
+        },
+        {
+          "client_id": "239251816565-k20mfqmr7a31e7chnobsdv7bu3dponos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 2,
+          "test_banner_ad_unit_id": "ca-app-pub-3940256099942544/6300978111",
+          "test_interstitial_ad_unit_id": "ca-app-pub-3940256099942544/1033173712"
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
