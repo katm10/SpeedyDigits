@@ -4,30 +4,26 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
+import com.google.example.games.basegameutils.BaseGameUtils;
 
 public class SplashActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+        GoogleApiClient.OnConnectionFailedListener,  GoogleApiClient.ConnectionCallbacks {
 
     private static final String TAG = "SplashActivity";
     private static final int RC_SIGN_IN = 9001;
+    private boolean mResolvingConnectionFailure = false;
+    private boolean mAutoStartSignInFlow = true;
+    private boolean mSignInClicked = false;
 
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
@@ -40,26 +36,28 @@ public class SplashActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // Button listeners
+     /*   // Button listeners
         findViewById(R.id.signinbutton).setOnClickListener(this);
         findViewById(R.id.signoutbutton).setOnClickListener(this);
-        findViewById(R.id.disconnectbutton).setOnClickListener(this);
+        findViewById(R.id.disconnectbutton).setOnClickListener(this);*/
 
         // [START configure_signin]
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+       /* GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
         // [END configure_signin]
-
+*/
         // [START build_client]
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
               //  .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                // .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .addApi(Games.API)
+                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(this)
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
         // [END build_client]
 
@@ -73,18 +71,18 @@ public class SplashActivity extends AppCompatActivity implements
         // difference.
         SignInButton signInButton = (SignInButton) findViewById(R.id.signinbutton);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setScopes(gso.getScopeArray());
+        //signInButton.setScopes(gso.getScopeArray());
         // [END customize_button]
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+       // AdView mAdView = (AdView) findViewById(R.id.adView);
+        //AdRequest adRequest = new AdRequest.Builder().build();
+        //mAdView.loadAd(adRequest);
     }
 
     @Override
-    public void onStart() {
+    protected void onStart() {
         super.onStart();
-
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        mGoogleApiClient.connect();
+       /* OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (opr.isDone()) {
             // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
             // and the GoogleSignInResult will be available instantly.
@@ -103,9 +101,40 @@ public class SplashActivity extends AppCompatActivity implements
                     handleSignInResult(googleSignInResult);
                 }
             });
-        }
+        }*/
     }
 
+    @Override
+    protected void onStop(){
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint){
+        findViewById(R.id.signinbutton).setVisibility(View.GONE);
+        findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
+        findViewById(R.id.disconnectbutton).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult){
+        if(mResolvingConnectionFailure){
+            return;
+        }
+        if(mSignInClicked || mAutoStartSignInFlow){
+            mAutoStartSignInFlow = false;
+            mSignInClicked = false;
+            mResolvingConnectionFailure = true;
+        }
+        if(!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "Error")){
+            mResolvingConnectionFailure = false;
+        }
+    }
+    @Override
+    public void onConnectionSuspended(int i){
+        mGoogleApiClient.connect();
+    }
     // [START onActivityResult]
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -113,12 +142,25 @@ public class SplashActivity extends AppCompatActivity implements
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+           mSignInClicked = false;
+            mResolvingConnectionFailure= false;
+            if(resultCode == RESULT_OK){
+                mGoogleApiClient.connect();
+            }else {
+                BaseGameUtils.showActivityResultError(this, resultCode,requestCode,R.string.sign_in_failed);
+            }
         }
     }
+    public void signInClicked(View v){
+        mSignInClicked=true;
+        mGoogleApiClient.connect();
+    }
+    public void signOutClicked(View v){
+        mSignInClicked=false;
+        Games.signOut(mGoogleApiClient);
+    }
     // [END onActivityResult]
-
+/*
     // [START handleSignInResult]
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
@@ -168,12 +210,6 @@ public class SplashActivity extends AppCompatActivity implements
     }
     // [END revokeAccess]
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
-        // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-    }
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
@@ -217,7 +253,7 @@ public class SplashActivity extends AppCompatActivity implements
                 break;
         }
     }
-
+*/
     public boolean helpIsPressed = false;
 
     public void openHelp(View v) {

@@ -69,7 +69,8 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         android:layout_alignBottom="@+id/achievements"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="signInClicked"/>
 
     <FrameLayout
         android:id="@+id/helplayout"
@@ -99,7 +100,8 @@
         android:id="@+id/signoutbutton"
         android:layout_below="@+id/signinbutton"
         android:layout_centerHorizontal="true"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        android:onClick="signOutClicked"/>
 
     <Button
         android:layout_width="wrap_content"
