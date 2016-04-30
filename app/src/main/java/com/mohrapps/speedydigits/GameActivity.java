@@ -11,18 +11,35 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Games;
+import com.google.example.games.basegameutils.BaseGameUtils;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static double milliTilDone;
+    private static final int RC_SIGN_IN = 9001;
+    private boolean mResolvingConnectionFailure = false;
+    private boolean mAutoStartSignInFlow = true;
+    private boolean mSignInClicked = false;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(this)
+                .build();
 
         final TextView gameOver = (TextView) findViewById(R.id.gameOverView);
         final Button homeButton = (Button) findViewById(R.id.homeButton);
@@ -30,6 +47,7 @@ public class GameActivity extends AppCompatActivity {
         final TextView pointView = (TextView) findViewById(R.id.points);
         final TextView timerView = (TextView) findViewById(R.id.timerTextView);
         final TextView topPoints = (TextView) findViewById(R.id.topPoints);
+
 
         Button b1 = (Button) findViewById(R.id.button);
         Button b2 = (Button) findViewById(R.id.button2);
@@ -73,11 +91,73 @@ public class GameActivity extends AppCompatActivity {
         checkClick(buttons, click, 0, 4, gameOver, homeButton, congrats, 1, pointView, topPoints, timerView, timer);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~Start of all the crazy google api stuff~~~~~~~~~~~~~~~~~
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        // findViewById(R.id.signinbutton).setVisibility(View.GONE);
+        // findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
+        //   findViewById(R.id.disconnectbutton).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (mResolvingConnectionFailure) {
+            return;
+        }
+        if (mSignInClicked || mAutoStartSignInFlow) {
+            mAutoStartSignInFlow = false;
+            mSignInClicked = false;
+            mResolvingConnectionFailure = true;
+        }
+        if (!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "Error")) {
+            mResolvingConnectionFailure = false;
+        }
+        /*while(!connectionResult.isSuccess()){
+            findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
+            findViewById(R.id.signoutbutton).setVisibility(View.GONE);
+        }*/
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    // [START onActivityResult]
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            mSignInClicked = false;
+            mResolvingConnectionFailure = false;
+            if (resultCode == RESULT_OK) {
+                mGoogleApiClient.connect();
+            } else {
+                BaseGameUtils.showActivityResultError(this, resultCode, requestCode, R.string.sign_in_failed);
+            }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~end of crazy api stuff~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public void goHome(View view) {
         Intent intent = new Intent(GameActivity.this, SplashActivity.class);
         startActivity(intent);
     }
+
     private static boolean contains(ArrayList<Integer> array1, int num) {
         for (int i = 0; i < array1.size(); i++) {
             if (array1.get(i) == num) {
@@ -127,14 +207,16 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-    public static void checkClick(final Button[] buttons, final Button[] click,
-                                  final int clickNum, final int count, final TextView gameOver,
-                                  final Button homeButton, final FrameLayout congrats, final int points,
-                                  final TextView pointView, final TextView topPoints, final TextView timerView,
-                                  final CountDownTimer timer) {
-        // if (count == 9) {
-        // Games.Achievements.unlock(StartPage.getSingleton().getmGoogleApiClient(), "achievement_reached_level_8");
-        //}
+    public void checkClick(final Button[] buttons, final Button[] click,
+                           final int clickNum, final int count, final TextView gameOver,
+                           final Button homeButton, final FrameLayout congrats, final int points,
+                           final TextView pointView, final TextView topPoints, final TextView timerView,
+                           final CountDownTimer timer) {
+        if (count == 9) {
+            if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_you_are_doing_greight));
+            }
+        }
 
 
         if (click.length == clickNum) {

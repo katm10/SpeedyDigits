@@ -8,10 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
-import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameUtils;
@@ -69,13 +69,13 @@ public class SplashActivity extends AppCompatActivity implements
         // may be displayed when only basic profile is requested. Try adding the
         // Scopes.PLUS_LOGIN scope to the GoogleSignInOptions to see the
         // difference.
-        SignInButton signInButton = (SignInButton) findViewById(R.id.signinbutton);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
+     //   SignInButton signInButton = (SignInButton) findViewById(R.id.signinbutton);
+     //   signInButton.setSize(SignInButton.SIZE_STANDARD);
         //signInButton.setScopes(gso.getScopeArray());
         // [END customize_button]
-       // AdView mAdView = (AdView) findViewById(R.id.adView);
-        //AdRequest adRequest = new AdRequest.Builder().build();
-        //mAdView.loadAd(adRequest);
+       AdView mAdView = (AdView) findViewById(R.id.adView);
+       AdRequest adRequest = new AdRequest.Builder().build();
+       mAdView.loadAd(adRequest);
     }
 
     @Override
@@ -112,9 +112,9 @@ public class SplashActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle connectionHint){
-        findViewById(R.id.signinbutton).setVisibility(View.GONE);
-        findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
-        findViewById(R.id.disconnectbutton).setVisibility(View.VISIBLE);
+       // findViewById(R.id.signinbutton).setVisibility(View.GONE);
+       // findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
+     //   findViewById(R.id.disconnectbutton).setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -130,6 +130,10 @@ public class SplashActivity extends AppCompatActivity implements
         if(!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "Error")){
             mResolvingConnectionFailure = false;
         }
+        /*while(!connectionResult.isSuccess()){
+            findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
+            findViewById(R.id.signoutbutton).setVisibility(View.GONE);
+        }*/
     }
     @Override
     public void onConnectionSuspended(int i){
@@ -151,109 +155,21 @@ public class SplashActivity extends AppCompatActivity implements
             }
         }
     }
-    public void signInClicked(View v){
+ /*   public void signInClicked(View v){
         mSignInClicked=true;
         mGoogleApiClient.connect();
+        //TODO:this doesn't work :(
     }
     public void signOutClicked(View v){
         mSignInClicked=false;
-        Games.signOut(mGoogleApiClient);
-    }
-    // [END onActivityResult]
-/*
-    // [START handleSignInResult]
-    private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-            updateUI(true);
-        } else {
-            // Signed out, show unauthenticated UI.
-            updateUI(false);
-        }
-    }
-    // [END handleSignInResult]
-
-    // [START signIn]
-    private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-    // [END signIn]
-
-    // [START signOut]
-    private void signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        // [START_EXCLUDE]
-                        updateUI(false);
-                        // [END_EXCLUDE]
-                    }
-                });
-    }
-    // [END signOut]
-
-    // [START revokeAccess]
-    private void revokeAccess() {
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        // [START_EXCLUDE]
-                        updateUI(false);
-                        // [END_EXCLUDE]
-                    }
-                });
-    }
-    // [END revokeAccess]
-
-
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
+        mGoogleApiClient.disconnect();
+        findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
+        findViewById(R.id.signoutbutton).setVisibility(View.GONE);
+    }*/
+    public GoogleApiClient getmGoogleApiClient(){
+        return mGoogleApiClient;
     }
 
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
-
-    private void updateUI(boolean signedIn) {
-        if (signedIn) {
-            findViewById(R.id.signinbutton).setVisibility(View.GONE);
-            findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
-            findViewById(R.id.disconnectbutton).setVisibility(View.VISIBLE);
-        } else {
-            findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
-            findViewById(R.id.signoutbutton).setVisibility(View.GONE);
-            findViewById(R.id.disconnectbutton).setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.signinbutton:
-                signIn();
-                break;
-            case R.id.signoutbutton:
-                signOut();
-                break;
-            case R.id.disconnectbutton:
-                revokeAccess();
-                break;
-        }
-    }
-*/
     public boolean helpIsPressed = false;
 
     public void openHelp(View v) {
@@ -285,7 +201,7 @@ public class SplashActivity extends AppCompatActivity implements
     }
 
     public void openAchievements(View v) {
-        if (mGoogleApiClient.getConnectionResult(Auth.GOOGLE_SIGN_IN_API).isSuccess()) {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()){
             startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient),
                     REQUEST_ACHIEVEMENT);
         } else {
@@ -302,7 +218,7 @@ public class SplashActivity extends AppCompatActivity implements
 
 
     public void openLeaderboard(View v) {
-        if (mGoogleApiClient.getConnectionResult(Auth.GOOGLE_SIGN_IN_API).isSuccess()) {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             startActivityForResult(Games.Leaderboards.getLeaderboardIntent(mGoogleApiClient,
                     getString(R.string.leaderboard_speedy_digits_leaderboard)), REQUEST_LEADERBOARD);
         } else {
