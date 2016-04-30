@@ -212,10 +212,26 @@ public class GameActivity extends AppCompatActivity implements GoogleApiClient.C
                            final Button homeButton, final FrameLayout congrats, final int points,
                            final TextView pointView, final TextView topPoints, final TextView timerView,
                            final CountDownTimer timer) {
-        if (count == 9) {
-            if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-                Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_you_are_doing_greight));
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            switch (count) {
+                case 9:
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_you_are_doing_greight));
+                    break;
+                case 10:
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_youre_doing_nine_fine));
+                    break;
+                case 11:
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_youre_a_perfect_ten));
+                    break;
+                case 12:
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_these_go_to_eleven));
+                    break;
+                case 13:
+                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_you_beat_the_game));
+                    break;
             }
+
+
         }
 
 
@@ -287,6 +303,7 @@ public class GameActivity extends AppCompatActivity implements GoogleApiClient.C
                             gameOver.bringToFront();
                             homeButton.setVisibility(View.VISIBLE);
                             timer.cancel();
+                            Games.Leaderboards.submitScore(mGoogleApiClient, getString(R.string.leaderboard_speedy_digits_leaderboard), points);
                         }
                     }
 
