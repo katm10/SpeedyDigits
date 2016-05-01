@@ -17,7 +17,7 @@ import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
 public class SplashActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener,  GoogleApiClient.ConnectionCallbacks {
+        GoogleApiClient.OnConnectionFailedListener,  GoogleApiClient.ConnectionCallbacks{
 
     private static final String TAG = "SplashActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -36,10 +36,22 @@ public class SplashActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-     /*   // Button listeners
-        findViewById(R.id.signinbutton).setOnClickListener(this);
-        findViewById(R.id.signoutbutton).setOnClickListener(this);
-        findViewById(R.id.disconnectbutton).setOnClickListener(this);*/
+        // Button listeners
+        findViewById(R.id.signinbutton).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mSignInClicked=true;
+                mGoogleApiClient.connect();
+            }
+        });
+        findViewById(R.id.signoutbutton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSignInClicked=false;
+                mGoogleApiClient.disconnect();
+                findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
+                findViewById(R.id.signoutbutton).setVisibility(View.GONE);
+            }
+        });
 
         // [START configure_signin]
         // Configure sign-in to request the user's ID, email address, and basic
@@ -112,9 +124,8 @@ public class SplashActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle connectionHint){
-       // findViewById(R.id.signinbutton).setVisibility(View.GONE);
-       // findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
-     //   findViewById(R.id.disconnectbutton).setVisibility(View.VISIBLE);
+        findViewById(R.id.signinbutton).setVisibility(View.GONE);
+        findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -130,10 +141,10 @@ public class SplashActivity extends AppCompatActivity implements
         if(!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "Error")){
             mResolvingConnectionFailure = false;
         }
-        /*while(!connectionResult.isSuccess()){
+        while(!connectionResult.isSuccess()){
             findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
             findViewById(R.id.signoutbutton).setVisibility(View.GONE);
-        }*/
+        }
     }
     @Override
     public void onConnectionSuspended(int i){
@@ -166,9 +177,9 @@ public class SplashActivity extends AppCompatActivity implements
         findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
         findViewById(R.id.signoutbutton).setVisibility(View.GONE);
     }*/
-    public GoogleApiClient getmGoogleApiClient(){
-        return mGoogleApiClient;
-    }
+   // public GoogleApiClient getmGoogleApiClient(){
+    //    return mGoogleApiClient;
+   // }
 
     public boolean helpIsPressed = false;
 
