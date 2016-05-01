@@ -48,7 +48,6 @@ public class GameActivity extends AppCompatActivity implements GoogleApiClient.C
         final TextView timerView = (TextView) findViewById(R.id.timerTextView);
         final TextView topPoints = (TextView) findViewById(R.id.topPoints);
 
-
         Button b1 = (Button) findViewById(R.id.button);
         Button b2 = (Button) findViewById(R.id.button2);
         Button b3 = (Button) findViewById(R.id.button3);
@@ -95,7 +94,9 @@ public class GameActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
+        if (getIntent().getExtras().getBoolean("clientIsConnected")) {
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
@@ -153,6 +154,7 @@ public class GameActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     //~~~~~~~~~~~~~~~~~end of crazy api stuff~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     public void goHome(View view) {
         Intent intent = new Intent(GameActivity.this, SplashActivity.class);
         startActivity(intent);
@@ -303,7 +305,9 @@ public class GameActivity extends AppCompatActivity implements GoogleApiClient.C
                             gameOver.bringToFront();
                             homeButton.setVisibility(View.VISIBLE);
                             timer.cancel();
-                            Games.Leaderboards.submitScore(mGoogleApiClient, getString(R.string.leaderboard_speedy_digits_leaderboard), points);
+                            if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                                Games.Leaderboards.submitScore(mGoogleApiClient, getString(R.string.leaderboard_speedy_digits_leaderboard), points);
+                            }
                         }
                     }
 

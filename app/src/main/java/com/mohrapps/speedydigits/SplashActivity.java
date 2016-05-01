@@ -17,7 +17,7 @@ import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
 public class SplashActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener,  GoogleApiClient.ConnectionCallbacks{
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     private static final String TAG = "SplashActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -39,14 +39,14 @@ public class SplashActivity extends AppCompatActivity implements
         // Button listeners
         findViewById(R.id.signinbutton).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                mSignInClicked=true;
+                mSignInClicked = true;
                 mGoogleApiClient.connect();
             }
         });
         findViewById(R.id.signoutbutton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSignInClicked=false;
+                mSignInClicked = false;
                 mGoogleApiClient.disconnect();
                 findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
                 findViewById(R.id.signoutbutton).setVisibility(View.GONE);
@@ -65,8 +65,8 @@ public class SplashActivity extends AppCompatActivity implements
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-              //  .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-               // .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                //  .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                // .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addOnConnectionFailedListener(this)
                 .addConnectionCallbacks(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
@@ -81,13 +81,13 @@ public class SplashActivity extends AppCompatActivity implements
         // may be displayed when only basic profile is requested. Try adding the
         // Scopes.PLUS_LOGIN scope to the GoogleSignInOptions to see the
         // difference.
-     //   SignInButton signInButton = (SignInButton) findViewById(R.id.signinbutton);
-     //   signInButton.setSize(SignInButton.SIZE_STANDARD);
+        //   SignInButton signInButton = (SignInButton) findViewById(R.id.signinbutton);
+        //   signInButton.setSize(SignInButton.SIZE_STANDARD);
         //signInButton.setScopes(gso.getScopeArray());
         // [END customize_button]
-       AdView mAdView = (AdView) findViewById(R.id.adView);
-       AdRequest adRequest = new AdRequest.Builder().build();
-       mAdView.loadAd(adRequest);
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override
@@ -117,39 +117,41 @@ public class SplashActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
     }
 
     @Override
-    public void onConnected(Bundle connectionHint){
+    public void onConnected(Bundle connectionHint) {
         findViewById(R.id.signinbutton).setVisibility(View.GONE);
         findViewById(R.id.signoutbutton).setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult){
-        if(mResolvingConnectionFailure){
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (mResolvingConnectionFailure) {
             return;
         }
-        if(mSignInClicked || mAutoStartSignInFlow){
+        if (mSignInClicked || mAutoStartSignInFlow) {
             mAutoStartSignInFlow = false;
             mSignInClicked = false;
             mResolvingConnectionFailure = true;
         }
-        if(!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "Error")){
+        if (!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "Error")) {
             mResolvingConnectionFailure = false;
         }
-        while(!connectionResult.isSuccess()){
+        while (!connectionResult.isSuccess()) {
             findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
             findViewById(R.id.signoutbutton).setVisibility(View.GONE);
         }
     }
+
     @Override
-    public void onConnectionSuspended(int i){
+    public void onConnectionSuspended(int i) {
         mGoogleApiClient.connect();
     }
+
     // [START onActivityResult]
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -157,12 +159,12 @@ public class SplashActivity extends AppCompatActivity implements
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-           mSignInClicked = false;
-            mResolvingConnectionFailure= false;
-            if(resultCode == RESULT_OK){
+            mSignInClicked = false;
+            mResolvingConnectionFailure = false;
+            if (resultCode == RESULT_OK) {
                 mGoogleApiClient.connect();
-            }else {
-                BaseGameUtils.showActivityResultError(this, resultCode,requestCode,R.string.sign_in_failed);
+            } else {
+                BaseGameUtils.showActivityResultError(this, resultCode, requestCode, R.string.sign_in_failed);
             }
         }
     }
@@ -177,9 +179,9 @@ public class SplashActivity extends AppCompatActivity implements
         findViewById(R.id.signinbutton).setVisibility(View.VISIBLE);
         findViewById(R.id.signoutbutton).setVisibility(View.GONE);
     }*/
-   // public GoogleApiClient getmGoogleApiClient(){
+    // public GoogleApiClient getmGoogleApiClient(){
     //    return mGoogleApiClient;
-   // }
+    // }
 
     public boolean helpIsPressed = false;
 
@@ -208,11 +210,16 @@ public class SplashActivity extends AppCompatActivity implements
 
     public void startGame(View v) {
         Intent intent = new Intent(this, GameActivity.class);
+        boolean clientIsConnected = false;
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            clientIsConnected = true;
+        }
+        intent.putExtra("clientIsConnected", clientIsConnected);
         startActivity(intent);
     }
 
     public void openAchievements(View v) {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()){
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient),
                     REQUEST_ACHIEVEMENT);
         } else {
